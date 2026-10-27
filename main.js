@@ -79,23 +79,35 @@ function detectHasAlpha(file) {
   }
 }
 
+/* 清理未被引用的贴纸文件（时间戳改名方案 + 旧版固定名遗留） */
+function cleanupStickerFiles(keep) {
+  const RE = /^sticker(?:-[^.]*)?\.(png|jpe?g|gif|webp|bmp)$/i;
+  try {
+    for (const f of fs.readdirSync(APP_ROOT)) {
+      if (f !== keep && RE.test(f)) {
+        try { fs.unlinkSync(path.join(APP_ROOT, f)); } catch (_) {}
+      }
+    }
+  } catch (_) {}
+}
+
 function setStickerFrom(srcPath) {
   try {
     const ext = path.extname(srcPath || '').toLowerCase();
     if (!STICKER_EXTS.includes(ext)) {
       return { ok: false, error: '仅支持 png / jpg / gif / webp / bmp 图片' };
     }
-    for (const e of STICKER_EXTS) {
-      const f = path.join(APP_ROOT, 'sticker' + e);
-      if (e !== ext && fs.existsSync(f)) {
-        try { fs.unlinkSync(f); } catch (_) {}
-      }
-    }
-    const dest = path.join(APP_ROOT, 'sticker' + ext);
-    fs.copyFileSync(srcPath, dest);
+    /* 关键修复：不再覆盖固定文件名 sticker.<ext>。
+       旧图正被窗口显示，Windows 下同名覆盖会偶发 EPERM（"有时候换不了图"）。
+       改为每次写一个带时间戳的新文件，旧文件仍被占用就留给启动时清理。 */
+    const buf = fs.readFileSync(srcPath);
+    const name = 'sticker-' + Date.now().toString(36) + ext;
+    const dest = path.join(APP_ROOT, name);
+    fs.writeFileSync(dest, buf);
+    store.sticker = name;
     removeCutFile();
-    store.sticker = 'sticker' + ext;
     writeStore();
+    cleanupStickerFiles(name);
     return { ok: true, url: pathToFileURL(dest).href, hasAlpha: detectHasAlpha(dest) };
   } catch (e) {
     return { ok: false, error: String((e && e.message) || e) };
@@ -109,18 +121,23 @@ ipcMain.handle('sticker:pick', async () => {
     filters: [{ name: '图片', extensions: ['png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp'] }]
   });
   if (r.canceled || !r.filePaths.length) return { ok: false, canceled: true };
-  return setStickerFrom(r.filePaths[0]);
+  const res = setStickerFrom(r.filePaths[0]);
+  if (!res.ok) {
+    dialog.showMessageBox(win, { type: 'warning', title: '待办便签', message: '贴纸更换失败', detail: res.error });
+  }
+  return res;
 });
 
-ipcMain.handle('sticker:set', (_e, p) => setStickerFrom(p));
+ipcMain.handle('sticker:set', (_e, p) => {
+  const res = setStickerFrom(p);
+  if (!res.ok) {
+    dialog.showMessageBox(win, { type: 'warning', title: '待办便签', message: '贴纸设置失败', detail: res.error });
+  }
+  return res;
+});
 
 ipcMain.handle('sticker:clear', () => {
-  for (const e of STICKER_EXTS) {
-    const f = path.join(APP_ROOT, 'sticker' + e);
-    if (fs.existsSync(f)) {
-      try { fs.unlinkSync(f); } catch (_) {}
-    }
-  }
+  cleanupStickerFiles(null);
   removeCutFile();
   store.sticker = null;
   writeStore();
@@ -142,6 +159,7 @@ function safeBounds(w) {
 
 function createWindow() {
   readStore();
+  cleanupStickerFiles(store.sticker);
   const b = safeBounds(store.window);
 
   win = new BrowserWindow({

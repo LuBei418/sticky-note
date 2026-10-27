@@ -1,0 +1,601 @@
+:root {
+  --paper: #FDF9EF;
+  --rule: #EFE5CB;
+  --ink: #33302A;
+  --muted: #A79D86;
+  --faint: #D8CEB4;
+  --accent: #C96B4A;
+  --accent-soft: #E7C4B3;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  background: transparent;
+  overflow: hidden;
+}
+
+body {
+  font-family: "Microsoft YaHei UI", "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  color: var(--ink);
+  user-select: none;
+  cursor: default;
+  display: flex;
+  flex-direction: column;
+  padding: 7px;
+  gap: 6px;
+}
+
+.card {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+/* ---------- 标题栏内的透明度滑条 ---------- */
+/* 特意只占一小段：中间留出大块空白给拖窗口用（no-drag 会吃掉拖拽区） */
+.slider-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+  width: 104px;
+  margin-left: auto;
+  margin-right: 2px;
+  -webkit-app-region: no-drag;
+}
+
+.op-icon {
+  flex: 0 0 auto;
+  color: #CFC5AC;
+  display: block;
+}
+
+.op-val {
+  flex: 0 0 auto;
+  width: 27px;
+  text-align: right;
+  font-size: 9px;
+  line-height: 1;
+  color: #C4BAA1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .1px;
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  flex: 1 1 auto;
+  width: 100%;
+  height: 16px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: none;
+  cursor: pointer;
+  background-color: transparent;
+  background-image: linear-gradient(
+    to right,
+    var(--accent) 0,
+    var(--accent) var(--fill, 100%),
+    rgba(90, 75, 45, .13) var(--fill, 100%),
+    rgba(90, 75, 45, .13) 100%
+  );
+  background-size: 100% 3px;
+  background-position: left center;
+  background-repeat: no-repeat;
+  border-radius: 3px;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 3px;
+  background: transparent;
+  border: 0;
+  border-radius: 3px;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 11px;
+  height: 11px;
+  margin-top: -4px;
+  border-radius: 50%;
+  background: #FFFDF8;
+  border: 1.6px solid var(--accent);
+  box-shadow: 0 1px 3px rgba(74, 60, 30, .28);
+  transition: transform .12s ease;
+}
+
+input[type="range"]:hover::-webkit-slider-thumb { transform: scale(1.1); }
+input[type="range"]:active::-webkit-slider-thumb { transform: scale(1.18); }
+
+/* ---------- 顶栏 ---------- */
+header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 8px 7px 14px;
+  flex: 0 0 auto;
+  -webkit-app-region: drag;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  flex: 0 0 auto;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: .85;
+  flex: 0 0 auto;
+}
+
+.title {
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: .6px;
+  color: #5C5344;
+  white-space: nowrap;
+}
+
+.counter {
+  font-size: 10.5px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  transition: color .2s;
+  white-space: nowrap;
+}
+
+/* 底栏右侧：先计数，最右边是贴纸按钮 */
+.foot-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+}
+
+.sticker-btn {
+  width: 19px;
+  height: 19px;
+  border-radius: 5px;
+  color: #CFC5AC;
+  -webkit-app-region: no-drag;
+}
+
+.sticker-btn:hover { color: var(--ink); }
+
+.sticker-btn.active {
+  color: var(--accent);
+  background: rgba(201, 107, 74, .12);
+}
+
+.actions {
+  display: flex;
+  gap: 1px;
+  -webkit-app-region: no-drag;
+}
+
+.icon {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: background .14s, color .14s;
+}
+
+.icon:hover { background: rgba(90, 75, 45, .07); color: var(--ink); }
+.icon.pin.active { color: var(--accent); background: rgba(201, 107, 74, .12); }
+.icon.close:hover { background: rgba(201, 107, 74, .14); color: var(--accent); }
+
+/* ---------- 进度条 ---------- */
+.progress {
+  height: 2px;
+  margin: 0 14px;
+  background: rgba(0, 0, 0, .05);
+  border-radius: 2px;
+  overflow: hidden;
+  flex: 0 0 auto;
+}
+
+.progress i {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: var(--accent);
+  opacity: .5;
+  border-radius: 2px;
+  transition: width .35s cubic-bezier(.2, .8, .2, 1);
+}
+
+/* ---------- 列表 ---------- */
+/* 舞台：列表 + 贴纸的共同区域；面板展开时舞台自动变矮，贴纸跟着上移不被挡住 */
+.stage {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.list {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 4px 12px 4px 14px;
+}
+
+.list::-webkit-scrollbar { width: 4px; }
+.list::-webkit-scrollbar-thumb { background: var(--faint); border-radius: 4px; }
+.list::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+.row {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 6px 0 7px 0;
+  min-height: 31px;
+}
+
+.row::after {
+  content: "";
+  position: absolute;
+  left: 24px;
+  right: var(--avoid, 0px);
+  bottom: 0;
+  height: 1px;
+  background: var(--rule);
+  transition: background .15s, right .22s cubic-bezier(.22, .85, .25, 1);
+}
+
+/* 复选框 */
+.cb {
+  flex: 0 0 15px;
+  width: 15px;
+  height: 15px;
+  margin-top: 3px;
+  padding: 0;
+  border: 1.4px solid #CFC4A6;
+  border-radius: 4.5px;
+  background: transparent;
+  color: #fff;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: border-color .15s, background .15s, transform .1s;
+}
+
+.cb svg { opacity: 0; transform: scale(.7); transition: opacity .12s, transform .14s; }
+.cb:hover { border-color: var(--accent); background: rgba(201, 107, 74, .07); }
+.cb:active { transform: scale(.9); }
+
+.row.done .cb { background: var(--accent); border-color: var(--accent); }
+.row.done .cb svg { opacity: 1; transform: scale(1); }
+
+/* 文字 */
+.txt {
+  flex: 1 1 auto;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink);
+  word-break: break-word;
+  white-space: pre-wrap;
+  padding-right: 2px;
+  min-width: 0;
+}
+
+.row.done .txt {
+  color: var(--muted);
+  text-decoration: line-through;
+  text-decoration-color: var(--accent-soft);
+  text-decoration-thickness: 1.5px;
+}
+
+/* 悬浮删除 */
+.del {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  padding: 0;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--faint);
+  font-size: 11px;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity .14s, color .14s, background .14s;
+}
+
+.row:hover .del { opacity: 1; }
+.del:hover { color: var(--accent); background: rgba(201, 107, 74, .1); }
+
+/* 空白横线行 */
+.row.blank { cursor: text; }
+
+.row.blank .cb {
+  border-style: dashed;
+  border-color: #E4DAC1;
+  cursor: text;
+}
+
+.row.blank:hover .cb { border-color: var(--accent); background: transparent; }
+.row.blank:hover::after { background: #E2D5B4; }
+
+.row.blank .txt {
+  color: var(--faint);
+  font-size: 11.5px;
+  opacity: 0;
+  transition: opacity .15s;
+  padding-top: 1px;
+}
+
+.row.blank:hover .txt { opacity: 1; }
+
+/* 行内输入 */
+.row.editing::after { background: var(--accent); opacity: .45; height: 1.5px; }
+
+.editor {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink);
+  caret-color: var(--accent);
+  user-select: text;
+}
+
+/* 已完成分组 */
+.section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 15px 0 1px;
+  font-size: 10.5px;
+  letter-spacing: .6px;
+  color: var(--faint);
+  cursor: context-menu;
+}
+
+.section::after {
+  content: "";
+  flex: 1 1 auto;
+  height: 1px;
+  background: var(--rule);
+}
+
+/* ---------- 底栏 ---------- */
+footer {
+  flex: 0 0 auto;
+  padding: 5px 14px 7px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  -webkit-app-region: drag;
+}
+
+.hint {
+  font-size: 10.5px;
+  color: #CFC5AC;
+  letter-spacing: .2px;
+}
+
+/* 右下角缩放 */
+.grip {
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  width: 12px;
+  height: 12px;
+  cursor: nwse-resize;
+  -webkit-app-region: no-drag;
+}
+
+.grip::before {
+  content: "";
+  position: absolute;
+  right: 1px;
+  bottom: 1px;
+  width: 7px;
+  height: 7px;
+  border-right: 1.5px solid var(--faint);
+  border-bottom: 1.5px solid var(--faint);
+  border-radius: 0 0 4px 0;
+}
+
+/* ---------- 右下角贴纸（背景层花纹） ---------- */
+/* 列表压住贴纸，让贴纸像印在纸上的花纹 */
+header, .progress, footer {
+  position: relative;
+  z-index: 1;
+}
+
+.sticker {
+  position: absolute;
+  right: var(--sx, 10px);
+  bottom: var(--sy, 8px);
+  z-index: 0;
+  display: none;
+  /* 纯装饰：不吃鼠标事件，避免挡住拖动和点击 */
+  pointer-events: none;
+  transition: right .18s ease, bottom .18s ease;
+}
+
+.sticker.has { display: block; }
+
+/* 编辑模式（面板展开）：可以按住拖动位置 */
+.sticker.editing {
+  pointer-events: auto;
+  cursor: grab;
+  z-index: 3;
+  transition: none;
+}
+
+.sticker.editing:active { cursor: grabbing; }
+
+.sticker img {
+  display: block;
+  width: var(--sticker-size, 110px);
+  height: auto;
+  max-height: calc(100% - 4px);
+  object-fit: contain;
+  opacity: var(--sticker-ink, 1);
+  border-radius: 0;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* 圆角 */
+.sticker.style-round img {
+  border-radius: 12px;
+}
+
+/* 相纸：白边 + 投影，适合有背景的照片 */
+.sticker.style-photo img {
+  border-radius: 7px;
+  background: #fff;
+  box-shadow: 0 0 0 4px #FFFDF8, 0 5px 14px rgba(74, 60, 30, .26), 0 0 0 5px rgba(74, 60, 30, .06);
+}
+
+/* 融合纸面：白底图片会「化」进纸张里，像印上去 */
+/* 必须打在容器上：img 被外层层叠上下文隔离，multiply 对不到纸面 */
+.sticker.blend {
+  mix-blend-mode: multiply;
+}
+
+/* 融合时彻底去掉贴纸感：无边框、无圆角、无白框、无投影 */
+.sticker.blend img {
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+/* 左右镜像 */
+.sticker.flip img {
+  transform: scaleX(-1);
+}
+
+/* 贴纸控制条：便签下方延伸出来的一块（窗口随之向下长高） */
+.sticker-panel {
+  flex: 0 0 auto;
+  display: none;
+  padding: 8px 12px 9px;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 13px;
+  -webkit-app-region: no-drag;
+}
+
+.sticker-panel.open { display: block; }
+
+.sp-grid {
+  display: grid;
+  grid-template-columns: auto 1fr 26px auto 1fr 30px;
+  align-items: center;
+  gap: 4px 5px;
+}
+
+.sp-label {
+  font-size: 10px;
+  color: var(--muted);
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.sp-val {
+  text-align: right;
+  font-size: 9.5px;
+  color: #C4BAA1;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* 样式胶囊按钮 */
+.sp-chips {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.sp-chip {
+  flex: 1 1 0;
+  height: 20px;
+  padding: 0 1px;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  background: #FFFDF7;
+  color: #8C8271;
+  font-family: inherit;
+  font-size: 9.5px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background .13s, color .13s, border-color .13s;
+}
+
+.sp-chip:hover { background: #F5EDDB; color: var(--ink); }
+
+.sp-chip.on {
+  background: rgba(201, 107, 74, .13);
+  border-color: rgba(201, 107, 74, .32);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.sp-mini {
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  background: #FFFDF7;
+  color: #8C8271;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: background .13s, color .13s;
+}
+
+.sp-mini:hover { background: #F5EDDB; color: var(--accent); }
+
+/* 空状态 */
+.empty {
+  padding: 26px 4px 10px;
+  text-align: center;
+  font-size: 11.5px;
+  color: var(--faint);
+  line-height: 1.8;
+}

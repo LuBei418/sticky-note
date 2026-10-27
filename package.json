@@ -1,0 +1,17 @@
+{
+  "name": "sticky-note",
+  "version": "1.0.0",
+  "description": "桌面便签条 - 置顶待办小卡片",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "electron": "^31.7.7"
+  },
+  "devDependencies": {
+    "rcedit": "^5.0.2"
+  }
+}

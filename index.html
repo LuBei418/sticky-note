@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;" />
+  <title>待办便签</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="card" id="card">
+    <header>
+      <div class="brand">
+        <span class="dot"></span>
+        <span class="title">待办</span>
+      </div>
+
+      <div class="slider-wrap">
+        <svg class="op-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"></path>
+          <circle cx="12" cy="12" r="3"></circle>
+        </svg>
+        <input type="range" id="opacityRange" min="25" max="100" step="1" value="100" aria-label="便签背景透明度" title="背景透明度（文字始终清晰）" />
+        <span class="op-val" id="opValue">100%</span>
+      </div>
+
+      <div class="actions">
+        <button class="icon pin" id="pinBtn" title="固定在顶层">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 17.5V22"></path>
+            <path d="M9 10.6V3.6h6v7a2.2 2.2 0 0 0 .76 1.65l1.55 1.3a.9.9 0 0 1-.58 1.6H7.27a.9.9 0 0 1-.58-1.6l1.55-1.3A2.2 2.2 0 0 0 9 10.6z"></path>
+          </svg>
+        </button>
+        <button class="icon close" id="closeBtn" title="关闭">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+            <path d="M6 6l12 12M18 6L6 18"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="progress"><i id="progressBar"></i></div>
+
+    <div class="stage" id="stage">
+      <div class="list" id="list"></div>
+      <div class="sticker" id="stickerBox" title="按住可拖动位置">
+        <img id="stickerImg" alt="" draggable="false" />
+      </div>
+    </div>
+
+    <footer>
+      <span class="hint">双击横线添加 · 右键管理</span>
+      <div class="foot-right">
+        <span class="counter" id="counter"></span>
+        <button class="icon sticker-btn" id="stickerBtn" title="贴纸设置">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="5.5"></rect>
+            <circle cx="8.6" cy="8.6" r="1.3"></circle>
+            <path d="M3.6 16.4l3.9-3.5a1.6 1.6 0 0 1 2.1 0l3.4 3"></path>
+            <path d="M13.4 15.2l1.9-1.6a1.6 1.6 0 0 1 2.1 0l3 2.6"></path>
+          </svg>
+        </button>
+      </div>
+    </footer>
+
+    <div class="grip" id="grip"></div>
+  </div>
+
+  <div class="sticker-panel" id="stickerPanel">
+      <div class="sp-grid">
+        <span class="sp-label">大小</span>
+        <input type="range" id="stickerSizeRange" min="48" max="260" step="2" value="110" />
+        <span class="sp-val" id="stickerSizeVal">110</span>
+
+        <span class="sp-label">浓度</span>
+        <input type="range" id="stickerInkRange" min="15" max="100" step="1" value="100" />
+        <span class="sp-val" id="stickerInkVal">100%</span>
+      </div>
+
+      <div class="sp-chips">
+        <button class="sp-chip" data-style="plain">原图</button>
+        <button class="sp-chip" data-style="round">圆角</button>
+        <button class="sp-chip" data-style="photo">相纸</button>
+        <button class="sp-chip" id="spBlend">融合</button>
+        <button class="sp-chip" id="spMirror" title="左右镜像">镜像</button>
+        <button class="sp-mini" id="spChange" title="更换图片">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="5"></rect>
+            <path d="M12 8.5v7M8.5 12h7"></path>
+          </svg>
+        </button>
+        <button class="sp-mini" id="spRemove" title="移除贴纸">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 7h16M9.5 7V4.6h5V7M6.5 7l.8 12.2A1.4 1.4 0 0 0 8.7 20.5h6.6a1.4 1.4 0 0 0 1.4-1.3L17.5 7"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>

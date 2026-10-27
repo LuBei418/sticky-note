@@ -1,0 +1,12 @@
+# 打包产物与运行时数据
+待办便签/
+*.zip
+data.json
+node_modules/
+
+# 素材（不想公开的私人照片）
+cat_photo_cutout.png
+
+# 系统杂项
+Thumbs.db
+.DS_Store

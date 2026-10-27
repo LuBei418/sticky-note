@@ -2,10 +2,14 @@
 
 一个为 Windows 桌面打造的轻量待办便签，用 Electron 实现。它长得像一张便利贴：可以钉在桌面最顶层、调透明度、右下角还能贴一张你喜欢的图片当贴纸。
 
-<p align="center">
-  <img src="cat.ico" width="64" alt="瓜瓜" /><br>
-  <video src="demo.mp4" controls muted loop width="330" alt="演示视频"></video>
-</p>
+<div align="center">
+  <table>
+    <tr>
+      <td align="center" width="150"><img src="cat.ico" width="64" alt="瓜瓜" /><br><b>Melon · 瓜瓜</b></td>
+      <td align="center"><img src="demo.gif" width="400" alt="功能演示" /></td>
+    </tr>
+  </table>
+</div>
 
 ## ✨ 功能
 
